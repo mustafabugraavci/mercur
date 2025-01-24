@@ -128,6 +128,58 @@ export interface AdminApplicationMethod {
   apply_to_quantity?: number;
 }
 
+/** The inventory levels to create, update, or delete. */
+export interface AdminBatchInventoryItemLocationsLevel {
+  /** The inventory levels to create. */
+  create?: {
+    /**
+     * location_id
+     * The ID of the associated location.
+     */
+    location_id: string;
+    /**
+     * stocked_quantity
+     * The inventory level's stocked quantity.
+     */
+    stocked_quantity?: number;
+    /**
+     * incoming_quantity
+     * The inventory level's incoming quantity.
+     */
+    incoming_quantity?: number;
+  }[];
+  /** The inventory levels to update. */
+  update?: {
+    /**
+     * stocked_quantity
+     * The inventory level's stocked quantity.
+     */
+    stocked_quantity?: number;
+    /**
+     * incoming_quantity
+     * The inventory level's incoming quantity.
+     */
+    incoming_quantity?: number;
+    /**
+     * location_id
+     * The associated stock location's ID.
+     */
+    location_id: string;
+    /**
+     * id
+     * The ID of the location level.
+     */
+    id?: string;
+  }[];
+  /** The inventory levels to delete. */
+  delete?: string[];
+  /**
+   * force
+   * Whether to delete specified inventory levels even if they have a non-zero stocked quantity.
+   */
+  force?: boolean;
+}
+
 /** The products to create, update, or delete. */
 export interface AdminBatchProductRequest {
   /** The products to create. */
@@ -3244,7 +3296,7 @@ export interface AdminImportProductResponse {
   };
 }
 
-/** The reservation's inventory item. */
+/** The inventory item's details. */
 export interface AdminInventoryItem {
   /**
    * id
@@ -3263,17 +3315,17 @@ export interface AdminInventoryItem {
   origin_country?: string;
   /**
    * hs_code
-   * The inventory item's hs code.
+   * The inventory item's HS code.
    */
   hs_code?: string;
   /**
    * requires_shipping
-   * The inventory item's requires shipping.
+   * Whether the inventory item requires shipping.
    */
   requires_shipping: boolean;
   /**
    * mid_code
-   * The inventory item's mid code.
+   * The inventory item's MID code.
    */
   mid_code?: string;
   /**
@@ -3313,10 +3365,10 @@ export interface AdminInventoryItem {
   description?: string;
   /**
    * thumbnail
-   * The inventory item's thumbnail.
+   * The thumbnail URL of the inventory item.
    */
   thumbnail?: string;
-  /** The inventory item's metadata. */
+  /** Custom key-value pairs, used to store additional information about the inventory item. */
   metadata?: object;
   /** The inventory item's location levels. */
   location_levels?: AdminInventoryLevel[];
@@ -3324,7 +3376,7 @@ export interface AdminInventoryItem {
 
 /** The inventory item's details. */
 export interface AdminInventoryItemResponse {
-  /** The reservation's inventory item. */
+  /** The inventory item's details. */
   inventory_item: AdminInventoryItem;
 }
 
@@ -5013,26 +5065,6 @@ export interface AdminPayment {
    * The ID of the payment provider used to process this payment.
    */
   provider_id: string;
-  /**
-   * cart_id
-   * The ID of the associated cart.
-   */
-  cart_id?: string;
-  /**
-   * order_id
-   * The ID of the associated order.
-   */
-  order_id?: string;
-  /**
-   * order_edit_id
-   * The ID of the associated order edit.
-   */
-  order_edit_id?: string;
-  /**
-   * customer_id
-   * ID of the associated customer.
-   */
-  customer_id?: string;
   /** The payment's data, useful for processing by the payment provider. */
   data?: object;
   /**
@@ -5090,11 +5122,6 @@ export interface AdminPaymentCollection {
    * The payment collection's currency code.
    */
   currency_code: string;
-  /**
-   * region_id
-   * The ID of the region this payment collection is associated with.
-   */
-  region_id: string;
   /**
    * amount
    * The total amount to be paid.
@@ -6987,6 +7014,8 @@ export interface AdminProductVariant {
   deleted_at: string;
   /** The variant's metadata, can hold custom key-value pairs. */
   metadata?: object;
+  /** The variant's inventory items. */
+  inventory_items?: AdminProductVariantInventoryItemLink[];
 }
 
 /** The details of the product variant's deletion. */
@@ -7076,6 +7105,28 @@ export interface AdminProductVariantInventoryBatchResponse {
           inventory_item_id: string;
         };
       }[];
+}
+
+/** An association between a product variant and an inventory item. */
+export interface AdminProductVariantInventoryItemLink {
+  /**
+   * id
+   * The ID of the association.
+   */
+  id: string;
+  /**
+   * variant_id
+   * The associated product variant's ID.
+   */
+  variant_id: string;
+  variant?: object;
+  /**
+   * inventory_item_id
+   * The associated inventory item's ID.
+   */
+  inventory_item_id: string;
+  /** The inventory item's details. */
+  inventory?: AdminInventoryItem;
 }
 
 /** The details of an association between a product variant and an inventory item. */
@@ -7172,6 +7223,8 @@ export interface AdminPromotion {
    * @format date-time
    */
   deleted_at: string;
+  /** The promotion's status. */
+  status?: "draft" | "active" | "inactive";
 }
 
 /** The promotion's details. */
@@ -7402,7 +7455,7 @@ export interface AdminReservation {
    * The ID of the inventory item this reservation is associated with.
    */
   inventory_item_id: string;
-  /** The reservation's inventory item. */
+  /** The inventory item's details. */
   inventory_item?: AdminInventoryItem;
   /** The reservation's metadata, can hold custom key-value pairs. */
   metadata?: object;
@@ -11755,26 +11808,6 @@ export interface BasePayment {
    * The ID of the payment provider used to process this payment.
    */
   provider_id: string;
-  /**
-   * cart_id
-   * The ID of the associated cart.
-   */
-  cart_id?: string;
-  /**
-   * order_id
-   * The ID of the associated order.
-   */
-  order_id?: string;
-  /**
-   * order_edit_id
-   * The ID of the associated order edit.
-   */
-  order_edit_id?: string;
-  /**
-   * customer_id
-   * ID of the associated customer.
-   */
-  customer_id?: string;
   /** The payment's data, useful for processing by the payment provider. */
   data?: object;
   /**
@@ -11831,11 +11864,6 @@ export interface BasePaymentCollection {
    * The payment collection's currency code.
    */
   currency_code: string;
-  /**
-   * region_id
-   * The ID of the region this payment collection is associated with.
-   */
-  region_id: string;
   /**
    * amount
    * The total amount to be paid.
@@ -21636,11 +21664,6 @@ export interface StorePaymentCollection {
    */
   currency_code: string;
   /**
-   * region_id
-   * The ID of the region this payment collection is associated with.
-   */
-  region_id: string;
-  /**
    * amount
    * The total amount to be paid.
    */
@@ -22852,6 +22875,64 @@ export interface WorkflowExecutionContext {
      */
     handlerType: string;
   }[];
+}
+
+/**
+ * ComissionRate
+ * Comission rate object
+ */
+export interface AdminComissionRate {
+  /** The unique identifier. */
+  id?: string;
+  /** Comission rate type. */
+  type?: "flat" | "percentage";
+  /** Percent of comission. */
+  percentage_rate?: number;
+  /** Indicates if rate is calculated including tax. */
+  include_tax?: boolean;
+  /** Flat comission value. */
+  price_set_id?: string;
+  /** Min comission value. */
+  min_price_set_id?: string;
+  /** Max comission value. */
+  max_price_set_id?: string;
+  /**
+   * The date with timezone at which the resource was created.
+   * @format date-time
+   */
+  created_at?: string;
+  /**
+   * The date with timezone at which the resource was last updated.
+   * @format date-time
+   */
+  updated_at?: string;
+}
+
+/**
+ * ComissionRule
+ * Comission rule object
+ */
+export interface AdminComissionRule {
+  /** The unique identifier. */
+  id?: string;
+  /** Comission rule name. */
+  name?: string;
+  /** Rule reference type */
+  reference?: string;
+  /** Rule reference id */
+  reference_id?: string;
+  /** Comission rate object */
+  rate?: AdminComissionRate;
+  /**
+   * The date with timezone at which the resource was created.
+   * @format date-time
+   */
+  created_at?: string;
+  /**
+   * The date with timezone at which the resource was last updated.
+   * @format date-time
+   */
+  updated_at?: string;
 }
 
 export interface CreateProductOption {
@@ -31865,20 +31946,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Add a Customer Group to a customer
+     * @description Manage the customer groups of a customer, adding or removing the customer from those groups.
      *
      * @tags Admin Customers
      * @name AdminPostCustomersIdCustomerGroups
-     * @summary Add Customer Group to Customer
+     * @summary Manage Customer Groups of Customer
      * @request POST:/admin/customers/{id}/customer-groups
      * @secure
      */
     adminPostCustomersIdCustomerGroups: (
       id: string,
       data: {
-        /** The customer's add. */
+        /** The customer groups to add the customer to. */
         add?: string[];
-        /** The customer's remove. */
+        /** The customer groups to remove the customer from. */
         remove?: string[];
       },
       query?: {
@@ -34797,6 +34878,82 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
+     * @description Manage inventory levels to create, update, or delete them.
+     *
+     * @tags Admin Inventory Items
+     * @name AdminPostInventoryItemsLocationLevelsBatch
+     * @summary Manage Inventory Levels
+     * @request POST:/admin/inventory-items/location-levels/batch
+     * @secure
+     */
+    adminPostInventoryItemsLocationLevelsBatch: (
+      data: {
+        /** The inventory levels to create. */
+        create?: {
+          /**
+           * location_id
+           * The ID of the associated stock location.
+           */
+          location_id: string;
+          /**
+           * inventory_item_id
+           * The ID of the associated inventory item.
+           */
+          inventory_item_id: string;
+          /**
+           * stocked_quantity
+           * The stocked quantity.
+           */
+          stocked_quantity?: number;
+          /**
+           * incoming_quantity
+           * The incoming quantity to be added to stock.
+           */
+          incoming_quantity?: number;
+        }[];
+        /** The inventory levels to update. */
+        update?: {
+          /**
+           * location_id
+           * The ID of the associated stock location.
+           */
+          location_id: string;
+          /**
+           * inventory_item_id
+           * The ID of the associated inventory item.
+           */
+          inventory_item_id: string;
+          /**
+           * stocked_quantity
+           * The stocked quantity.
+           */
+          stocked_quantity?: number;
+          /**
+           * incoming_quantity
+           * The incoming quantity to be added to stock.
+           */
+          incoming_quantity?: number;
+        }[];
+        /** The IDs of the inventory levels to delete. */
+        delete?: string[];
+        /**
+         * force
+         * Whether to delete specified inventory levels even if they have a non-zero stocked quantity.
+         */
+        force?: boolean;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<any, Error | string>({
+        path: `/admin/inventory-items/location-levels/batch`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
      * @description Retrieve a inventory item by its ID. You can expand the inventory item's relations or select the fields that should be returned.
      *
      * @tags Admin Inventory Items
@@ -35098,56 +35255,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      */
     adminPostInventoryItemsIdLocationLevelsBatch: (
       id: string,
-      data: {
-        /** The inventory levels to create. */
-        create?: {
-          /**
-           * location_id
-           * The ID of the associated location.
-           */
-          location_id: string;
-          /**
-           * stocked_quantity
-           * The inventory level's stocked quantity.
-           */
-          stocked_quantity?: number;
-          /**
-           * incoming_quantity
-           * The inventory level's incoming quantity.
-           */
-          incoming_quantity?: number;
-        }[];
-        /** The inventory levels to update. */
-        update?: {
-          /**
-           * stocked_quantity
-           * The inventory level's stocked quantity.
-           */
-          stocked_quantity?: number;
-          /**
-           * incoming_quantity
-           * The inventory level's incoming quantity.
-           */
-          incoming_quantity?: number;
-        }[];
-        /** The inventory levels to delete. */
-        delete?: string[];
-      },
+      data: AdminBatchInventoryItemLocationsLevel,
       params: RequestParams = {},
     ) =>
-      this.request<
-        {
-          /** The inventory item's details. */
-          inventory_item: object;
-        },
-        Error | string
-      >({
+      this.request<any, Error | string>({
         path: `/admin/inventory-items/${id}/location-levels/batch`,
         method: "POST",
         body: data,
         secure: true,
         type: ContentType.Json,
-        format: "json",
         ...params,
       }),
 
@@ -35234,7 +35350,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
            */
           deleted: boolean;
         } & {
-          /** The reservation's inventory item. */
+          /** The inventory item's details. */
           parent?: AdminInventoryItem;
         },
         Error | string
@@ -49598,6 +49714,46 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         secure: true,
         ...params,
       }),
+
+    /**
+     * @description Retrieves a list of comission rules.
+     *
+     * @tags Admin
+     * @name AdminListComissionRules
+     * @summary List Comission rules
+     * @request GET:/admin/comission/rules
+     * @secure
+     */
+    adminListComissionRules: (
+      query?: {
+        /** The number of items to skip before starting to collect the result set. */
+        offset?: number;
+        /** The number of items to return. */
+        limit?: number;
+        /** Comma-separated fields to include in the response. */
+        fields?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          products?: AdminComissionRule[];
+          /** The total number of items available */
+          count?: number;
+          /** The number of items skipped before these items */
+          offset?: number;
+          /** The number of items per page */
+          limit?: number;
+        },
+        any
+      >({
+        path: `/admin/comission/rules`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
   };
   auth = {
     /**
@@ -49676,7 +49832,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description This API route is used by your dashboard or frontend application when a third-party provider redirects to it after authentication. It validates the authentication with the third-party provider and, if successful, returns an authentication token. You can decode the JWT token using libraries like [react-jwt](https://www.npmjs.com/package/react-jwt) in the frontend. If the decoded data doesn't  have an `actor_id` property, then you must create a user, typically using the Accept Invite route passing the token in the request's Authorization header.
+     * @description This API route is used by your dashboard or frontend application when a third-party provider redirects to it after authentication. It validates the authentication with the third-party provider and, if successful, returns an authentication token. All query parameters received from the third-party provider, such as `code`, `state`, and `error`, must be passed as query parameters to this route. You can decode the JWT token using libraries like [react-jwt](https://www.npmjs.com/package/react-jwt) in the frontend. If the decoded data doesn't  have an `actor_id` property, then you must create a user, typically using the Accept Invite route passing the token in the request's Authorization header.
      *
      * @tags Admin Auth
      * @name AdminPostActorTypeAuthProviderCallback
@@ -49785,7 +49941,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description This API route is used by your storefront or frontend application when a third-party provider redirects to it after authentication. It validates the authentication with the third-party provider and, if successful, returns an authentication token. You can decode the JWT token using libraries like [react-jwt](https://www.npmjs.com/package/react-jwt) in the storefront. If the decoded data doesn't  have an `actor_id` property, then you must register the customer using the Create Customer API route passing the token in the request's Authorization header.
+     * @description This API route is used by your storefront or frontend application when a third-party provider redirects to it after authentication. It validates the authentication with the third-party provider and, if successful, returns an authentication token. All query parameters received from the third-party provider, such as `code`, `state`, and `error`, must be passed as query parameters to this route. You can decode the JWT token using libraries like [react-jwt](https://www.npmjs.com/package/react-jwt) in the storefront. If the decoded data doesn't  have an `actor_id` property, then you must register the customer using the Create Customer API route passing the token in the request's Authorization header.
      *
      * @tags Store Auth
      * @name StorePostActorTypeAuthProviderCallback
