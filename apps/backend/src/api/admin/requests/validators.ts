@@ -8,7 +8,12 @@ export const AdminGetRequestsParams = createFindParams({
   limit: 50
 }).extend({
   type: z
-    .enum(['product_collection', 'product_category', 'product'])
+    .enum([
+      'product_collection',
+      'product_category',
+      'product',
+      'review_remove'
+    ])
     .optional(),
   status: z.enum(['accepted', 'rejected', 'pending']).optional()
 })
